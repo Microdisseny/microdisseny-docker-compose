@@ -5,7 +5,7 @@ Contains multiple configurations to be used with docker compose.
 ## Add as submodule (recommended)
 ```sh
 # Add submodule
-git submodule add -b master git@github.com:Microdisseny/microdisseny-docker-compose.git docker
+git submodule add -b master https://github.com/Microdisseny/microdisseny-docker-compose.git docker
 
 # Initialize and pull all changes
 git submodule update --init --recursive
