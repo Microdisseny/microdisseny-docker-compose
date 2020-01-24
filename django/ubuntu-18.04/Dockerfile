@@ -11,11 +11,7 @@ RUN mkdir /root/.ssh/
 ADD docker/django/ssh/id_rsa /root/.ssh/
 RUN chmod 600 /root/.ssh/id_rsa
 
-# Make sure your domain is accepted
-RUN \
-  touch ~/.ssh/known_hosts && \
-  ssh-keyscan github.com >> ~/.ssh/known_hosts && \
-  ssh-keyscan bitbucket.org >> ~/.ssh/known_hosts
+ADD docker/config/known_hosts /root/.ssh/known_hosts
 
 ADD ./requirements*.txt /tmp/
 
