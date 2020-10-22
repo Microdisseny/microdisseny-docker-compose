@@ -10,27 +10,52 @@ if [[ ${ENVIRONMENT_NAME} = "devel" ]]
     exit 1
 fi
 
-PSQL="sudo -u postgres psql -c"
+SUDO="su postgres -c "
 
 # Standard
 echo "- Create database ${DB_NAME}"
-$PSQL "CREATE DATABASE \"${DB_NAME}\";"
+
+$SUDO 'psql <<EOF
+CREATE DATABASE "${DB_NAME}";
+EOF
+'
+
 echo "- Create role ${DB_USER}"
-$PSQL "CREATE ROLE \"${DB_USER}\" LOGIN;" ${DB_NAME}
-echo "- Set role ${DB_USER} password to ${DB_PASSWORD}"
-$PSQL "ALTER ROLE \"${DB_USER}\" WITH PASSWORD '${DB_PASSWORD}';" ${DB_NAME}
-echo "- Set role ${DB_USER} permissions SUPERUSER CREATEDB"
-$PSQL "ALTER ROLE \"${DB_USER}\" SUPERUSER CREATEDB;" ${DB_NAME}
+$SUDO 'psql ${DB_NAME} <<EOF
+CREATE ROLE "${DB_USER}" LOGIN;
+EOF
+'
+
+echo "- Set role ${DB_USER} password to ${DB_PASSWORD}'"
+$SUDO "psql ${DB_NAME} <<EOF
+ALTER ROLE \"${DB_USER}\" WITH PASSWORD '${DB_PASSWORD}';
+EOF
+"
+
+echo "- Set role ${DB_USER} permissions SUPERUSER CREATEDB'"
+$SUDO "psql ${DB_NAME} <<EOF
+ALTER ROLE \"${DB_USER}\" SUPERUSER CREATEDB;
+EOF
+"
 
 echo "- CREATE SCHEMA ${DB_USER};" ${DB_NAME}
-$PSQL "CREATE SCHEMA \"${DB_USER}\" AUTHORIZATION \"${DB_USER}\"; GRANT ALL ON SCHEMA \"${DB_USER}\" TO \"${DB_USER}\";" ${DB_NAME}
+$SUDO "psql ${DB_NAME} <<EOF
+CREATE SCHEMA \"${DB_USER}\" AUTHORIZATION \"${DB_USER}\"; GRANT ALL ON SCHEMA \"${DB_USER}\" TO \"${DB_USER}\";
+EOF
+"
 
 echo "- Add extension PostGIS"
-$PSQL "CREATE EXTENSION postgis;" ${DB_NAME}
+$SUDO "psql ${DB_NAME} <<EOF
+CREATE EXTENSION postgis;
+EOF
+"
 
 # Extra
 echo "- Create role admin"
-$PSQL "CREATE ROLE admin PASSWORD 'admin' SUPERUSER CREATEDB CREATEROLE INHERIT LOGIN;"
+$SUDO "psql ${DB_NAME} <<EOF
+CREATE ROLE admin PASSWORD 'admin' SUPERUSER CREATEDB CREATEROLE INHERIT LOGIN;
+EOF
+"
 
 if [ -z "$1" ]
   then
@@ -40,8 +65,16 @@ fi
 
 echo "Import database in $1"
 echo "- Drop schema ${DB_USER}"
-$PSQL "DROP SCHEMA \"${DB_USER}\" CASCADE;" ${DB_NAME}
+$SUDO "psql ${DB_NAME} <<EOF
+DROP SCHEMA \"${DB_USER}\" CASCADE;
+EOF
+"
+
 echo "- Drop schema topology"
-$PSQL "DROP SCHEMA topology CASCADE;" ${DB_NAME}
+$SUDO "psql ${DB_NAME} <<EOF
+DROP SCHEMA topology CASCADE;
+EOF
+"
+
 echo "- Run file $1"
-sudo -u postgres psql --set ON_ERROR_STOP=on ${DB_NAME} < $1
+$SUDO "psql --set ON_ERROR_STOP=on  ${DB_NAME} < /app/$1"
