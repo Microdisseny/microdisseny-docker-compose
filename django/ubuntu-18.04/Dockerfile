@@ -20,7 +20,7 @@ ARG EXTRA_REQUIREMENTS=devel
 ENV EXTRA_REQUIREMENTS $EXTRA_REQUIREMENTS
 
 RUN \
-  pip3 install --upgrade pip; \
+  pip3 install pip==20.2.2; \
   mkdir /pip; \
   pip3 download -d /pip uwsgi; \
   if [ -n "$EXTRA_REQUIREMENTS" -a -f "/tmp/requirements-$EXTRA_REQUIREMENTS.txt" ]; then \
@@ -47,7 +47,7 @@ RUN chmod +x /docker/*.sh
 
 # Install python requirements
 COPY --from=build-system /pip /pip
-RUN pip3 install --upgrade pip
+RUN pip3 install pip==20.2.2
 RUN pip3 install /pip/*
 RUN rm -rf /pip
 
