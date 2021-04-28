@@ -22,7 +22,6 @@ ENV EXTRA_REQUIREMENTS $EXTRA_REQUIREMENTS
 RUN \
   pip3 install pip==20.2.2; \
   mkdir /pip; \
-  pip3 download -d /pip uwsgi; \
   if [ -n "$EXTRA_REQUIREMENTS" -a -f "/tmp/requirements-$EXTRA_REQUIREMENTS.txt" ]; then \
     pip3 download -d /pip -r /tmp/requirements.txt -r "/tmp/requirements-$EXTRA_REQUIREMENTS.txt"; \
   else \
