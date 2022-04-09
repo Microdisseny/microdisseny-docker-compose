@@ -20,7 +20,8 @@ ARG EXTRA_REQUIREMENTS=devel
 ENV EXTRA_REQUIREMENTS $EXTRA_REQUIREMENTS
 
 RUN \
-  pip3 install pip==20.2.2; \
+  set -e && \
+  pip3 install pip -U; \
   mkdir /pip; \
   if [ -n "$EXTRA_REQUIREMENTS" -a -f "/tmp/requirements-$EXTRA_REQUIREMENTS.txt" ]; then \
     pip3 download -d /pip -r /tmp/requirements.txt -r "/tmp/requirements-$EXTRA_REQUIREMENTS.txt"; \
@@ -46,7 +47,7 @@ RUN chmod +x /docker/*.sh
 
 # Install python requirements
 COPY --from=build-system /pip /pip
-RUN pip3 install pip==20.2.2
+RUN pip3 install pip -U
 RUN pip3 install /pip/*
 RUN rm -rf /pip
 
