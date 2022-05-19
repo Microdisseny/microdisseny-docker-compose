@@ -17,11 +17,23 @@ ADD ./requirements*.txt /tmp/
 
 # Download python requirements
 ARG EXTRA_REQUIREMENTS=devel
-ENV EXTRA_REQUIREMENTS $EXTRA_REQUIREMENTS
+ARG PIP_PACKAGES
+ARG APT_PACKAGES
 
 RUN \
-  set -e && \
-  pip3 install pip -U; \
+  set -e; \
+  if [ -n "$APT_PACKAGES_BUILD" ]; then \
+    apt-get update && \
+    apt -y install $APT_PACKAGES_BUILD; \
+  fi; \
+
+  if [ -n "$PIP_PACKAGES" ]; then \
+    pip3 install $PIP_PACKAGES; \
+  fi;
+
+RUN \
+  set -e; \
+  pip3 install -U pip; \
   mkdir /pip; \
   if [ -n "$EXTRA_REQUIREMENTS" -a -f "/tmp/requirements-$EXTRA_REQUIREMENTS.txt" ]; then \
     pip3 download -d /pip -r /tmp/requirements.txt -r "/tmp/requirements-$EXTRA_REQUIREMENTS.txt"; \
@@ -47,7 +59,18 @@ RUN chmod +x /docker/*.sh
 
 # Install python requirements
 COPY --from=build-system /pip /pip
-RUN pip3 install pip -U
+ARG PIP_PACKAGES
+
+RUN \
+  set -e; \
+  if [ -n "$APT_PACKAGES" ]; then \
+    apt-get update && \
+    apt -y install $APT_PACKAGES; \
+  fi; \
+  if [ -n "$PIP_PACKAGES" ]; then \
+    pip3 install $PIP_PACKAGES; \
+  fi;
+RUN pip3 install -U pip
 RUN pip3 install /pip/*
 RUN rm -rf /pip
 
