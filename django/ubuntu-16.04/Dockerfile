@@ -6,11 +6,6 @@
 #
 FROM microdisseny/py3-development:ubuntu-16.04 as build-system
 
-# Copy private key
-RUN mkdir /root/.ssh/
-ADD docker/django/ssh/id_rsa /root/.ssh/
-RUN chmod 600 /root/.ssh/id_rsa
-
 ADD docker/config/known_hosts /root/.ssh/known_hosts
 
 ADD ./requirements*.txt /tmp/
@@ -19,15 +14,14 @@ ADD ./requirements*.txt /tmp/
 ARG EXTRA_REQUIREMENTS=devel
 ENV EXTRA_REQUIREMENTS $EXTRA_REQUIREMENTS
 
-RUN \
+RUN --mount=type=ssh \
   pip3 install pip==20.2.2; \
   mkdir /pip; \
   if [ -n "$EXTRA_REQUIREMENTS" -a -f "/tmp/requirements-$EXTRA_REQUIREMENTS.txt" ]; then \
     pip3 download -d /pip -r /tmp/requirements.txt -r "/tmp/requirements-$EXTRA_REQUIREMENTS.txt"; \
   else \
     pip3 download -d /pip -r /tmp/requirements.txt; \
-  fi; \
-  rm /root/.ssh/id_rsa
+  fi;
 
 
 #
