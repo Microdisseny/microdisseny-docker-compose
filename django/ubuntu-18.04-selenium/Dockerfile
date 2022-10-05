@@ -6,11 +6,6 @@
 #
 FROM microdisseny/py3-development:ubuntu-18.04-selenium as build-system
 
-# Copy private key
-RUN mkdir /root/.ssh/
-ADD docker/django/ssh/id_rsa /root/.ssh/
-RUN chmod 600 /root/.ssh/id_rsa
-
 ADD docker/config/known_hosts /root/.ssh/known_hosts
 
 ADD ./requirements*.txt /tmp/
@@ -19,7 +14,7 @@ ADD ./requirements*.txt /tmp/
 ARG EXTRA_REQUIREMENTS=devel
 ENV EXTRA_REQUIREMENTS $EXTRA_REQUIREMENTS
 
-RUN \
+RUN --mount=type=ssh \
   set -e && \
   pip3 install pip -U; \
   mkdir /pip; \
@@ -27,8 +22,7 @@ RUN \
     pip3 download -d /pip -r /tmp/requirements.txt -r "/tmp/requirements-$EXTRA_REQUIREMENTS.txt"; \
   else \
     pip3 download -d /pip -r /tmp/requirements.txt; \
-  fi; \
-  rm /root/.ssh/id_rsa
+  fi;
 
 
 #
