@@ -4,7 +4,7 @@
 # Downloads all the pip with the given ssh key. Allows to use private repos
 #  without the key
 #
-FROM microdisseny/py3-development:ubuntu-22.04 as build-system
+FROM microdisseny/py3-development:ubuntu-24.04 as build-system
 
 ADD docker/config/known_hosts /root/.ssh/known_hosts
 
@@ -29,6 +29,7 @@ RUN \
 RUN --mount=type=ssh \
   set -e; \
   pip3 install -U pip; \
+  pip3 install numpy; \
   mkdir /pip; \
   if [ -n "$EXTRA_REQUIREMENTS" -a -f "/tmp/requirements-$EXTRA_REQUIREMENTS.txt" ]; then \
     pip3 download -d /pip -r /tmp/requirements.txt -r "/tmp/requirements-$EXTRA_REQUIREMENTS.txt"; \
@@ -42,7 +43,7 @@ RUN --mount=type=ssh \
 #
 # The actual system that will be run
 #
-FROM microdisseny/py3-development:ubuntu-22.04
+FROM microdisseny/py3-development:ubuntu-24.04
 
 # Copy files
 RUN mkdir -p /app
