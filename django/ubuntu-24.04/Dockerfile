@@ -28,7 +28,7 @@ RUN \
 
 RUN --mount=type=ssh \
   set -e; \
-  pip3 install -U pip; \
+  pip3 install -U pip setuptools wheel packaging; \
   pip3 install numpy; \
   mkdir /pip; \
   if [ -n "$EXTRA_REQUIREMENTS" -a -f "/tmp/requirements-$EXTRA_REQUIREMENTS.txt" ]; then \
@@ -65,7 +65,7 @@ RUN \
   if [ -n "$PIP_PACKAGES" ]; then \
     pip3 install $PIP_PACKAGES; \
   fi;
-RUN pip3 install -U pip
+RUN pip3 install -U pip setuptools wheel packaging
 RUN pip3 install /pip/*
 RUN rm -rf /pip
 
