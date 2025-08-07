@@ -13,7 +13,7 @@ ADD ./requirements*.txt /tmp/
 # Download python requirements
 ARG EXTRA_REQUIREMENTS=devel
 ARG PIP_PACKAGES
-ARG APT_PACKAGES
+ARG APT_PACKAGES_BUILD
 
 RUN \
   set -e; \
@@ -54,6 +54,7 @@ RUN chmod +x /docker/*.sh
 # Install python requirements
 COPY --from=build-system /pip /pip
 ARG PIP_PACKAGES
+ARG APT_PACKAGES
 
 RUN \
   set -e; \
